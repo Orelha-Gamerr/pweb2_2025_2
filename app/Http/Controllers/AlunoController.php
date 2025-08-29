@@ -12,16 +12,7 @@ class AlunoController extends Controller
      */
     public function index()
     {
-        /*
-        Aluno::create([
-            "nome" => 'Jackson Five',
-            "cpf" => '555000777-55',
-            "telefone" => '49 8866-0555',
-        ]);
-*/
         $dados = Aluno::All();
-
-        // dd($dados);
 
         return view('aluno.list', ['dados' => $dados]);
     }
@@ -31,7 +22,7 @@ class AlunoController extends Controller
      */
     public function create()
     {
-        //
+        return view('aluno.form');
     }
 
     /**
@@ -39,7 +30,20 @@ class AlunoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //dd(vars: $request->all());
+
+        $request->validate([
+            'nome' => 'required',
+            'cpf' => 'required|unique:alunos,cpf',
+        ],[
+            'nome.required' => 'O nome é obrigatório',
+            'cpf.required' => 'O CPF é obrigatório',
+            'cpf.unique' => 'Já existe um aluno com este CPF',
+        ]);
+
+        Aluno::create($request->all());
+
+        return redirect()->route('aluno.index');
     }
 
     /**
