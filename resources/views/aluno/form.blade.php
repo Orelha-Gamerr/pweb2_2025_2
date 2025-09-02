@@ -14,7 +14,7 @@
             </div>
             <div class="col">
                 <label for="telefone">Telefone:</label>
-                <input type="text" id="telefone" name="talefone" required>
+                <input type="text" id="telefone" name="telefone" required>
             </div>
             <div class="row">
                 <div class="col">
