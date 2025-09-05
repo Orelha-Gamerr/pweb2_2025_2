@@ -59,7 +59,10 @@ class AlunoController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $dados = Aluno::findOrFail($id);
+        //dd($dado);
+
+        return view('aluno.form', ['dados' => $dados]);
     }
 
     /**
@@ -67,7 +70,19 @@ class AlunoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        //dd($request->all(), $id);
+
+        $request->validate([
+            'nome' => 'required',
+            'cpf' => "required",
+        ],[
+            'nome.required' => 'O nome é obrigatório',
+            'cpf.required' => 'O CPF é obrigatório',
+        ]);
+
+        Aluno::updateOrCreate(['id' => $id], $request->all());
+
+        return redirect('aluno');
     }
 
     /**

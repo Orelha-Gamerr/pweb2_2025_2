@@ -22,11 +22,11 @@
                         <input type="text" class="form-control" id="valor" name="valor" placeholder="Pesquisar...">
                     </div>
 
-                    <div class="col-md-1">
-                        <button class="btn btn-success" type="submit">Buscar</button>
+                    <div class="col-md-2">
+                        <button class="btn btn-success" type="submit"> <i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
                     </div>
-                    <div class="col-md-1">
-                        <a class="btn btn-warning" href="{{ url('aluno/create')}}">Cadastrar</a>
+                    <div class="col-md-2">
+                        <a class="btn btn-warning" href="{{ url('aluno/create')}}"><i class="fa-solid fa-plus"></i> Cadastrar</a>
                     </div>
                 </div>
             </form>
@@ -54,7 +54,7 @@
                     <td>{{$item->nome}}</td>
                     <td>{{$item->cpf}}</td>
                     <td>{{$item->telefone}}</td>
-                    <td>Editar</td>
+                    <td> <a class="btn btn-sm btn-primary" href="{{ route('aluno.edit', $item->id) }}"><i class="fa-solid fa-pen-to-square"></i></a></td>
                     <td>
                         <form action="{{ route('aluno.destroy',$item->id) }}" method="post">
                             @csrf
