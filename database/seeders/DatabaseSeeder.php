@@ -15,8 +15,8 @@ class DatabaseSeeder extends Seeder
         // \App\Models\User::factory(10)->create();
 
         $this->call([
-            AlunoSeeder::class,
             CategoriaAlunoSeeder::class,
+            AlunoSeeder::class,
         ]);
 
         // \App\Models\User::factory()->create([

@@ -15,5 +15,12 @@ class Aluno extends Model
         'nome',
         'cpf',
         'telefone',
+        'imagem',
+        'categoria_id'
     ];
+
+    public function categoria()
+    {
+        return $this->belongsTo(CategoriaAluno::class, 'categoria_id');
+    }
 }
