@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Aluno;
+use App\Models\CategoriaAluno;
 use Illuminate\Http\Request;
 
 class AlunoController extends Controller
@@ -22,28 +23,55 @@ class AlunoController extends Controller
      */
     public function create()
     {
-        return view('aluno.form');
+        $categorias = CategoriaAluno::orderBy('nome')->get();
+
+        return view('aluno.form', [
+            'categorias' => $categorias
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
+
+    private function validateRequest(Request $request)
+    {
+        $request->validate([
+            'nome' => 'required',
+            'cpf' => "required",
+            'categoria_id' => 'required',
+            'imagem' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg',
+        ], [
+            'nome.required' => 'O nome é obrigatório',
+            'cpf.required' => 'O CPF é obrigatório',
+            'categoria_id.required' => 'A categoria é obrigatória',
+            'imagem.image' => 'O arquivo deve ser uma imagem',
+            'imagem.mimes' => 'A imagem deve ser do tipo: jpeg, png, jpg, gif, svg',
+        ]);
+    }
     public function store(Request $request)
     {
         //dd(vars: $request->all());
 
-        $request->validate([
-            'nome' => 'required',
-            'cpf' => 'required|unique:alunos,cpf',
-        ],[
-            'nome.required' => 'O nome é obrigatório',
-            'cpf.required' => 'O CPF é obrigatório',
-            'cpf.unique' => 'Já existe um aluno com este CPF',
-        ]);
+        $this->validateRequest($request);
+        $data = $request->all();
+        $imagem = $request->file('imagem');
 
-        Aluno::create($request->all());
+        if ($imagem) {
+            $nome_imagem = date('YmdHis') . "." . $imagem->getClientOriginalExtension();
+            $diretorio = 'imagem/aluno/';
 
-        return redirect()->route('aluno.index');
+            $imagem->storeAs(
+                $diretorio,
+                $nome_imagem,
+                'public'
+            );
+            $data['imagem'] = $diretorio . $nome_imagem;
+        }
+
+        Aluno::create($data);
+
+        return redirect()->route('aluno');
     }
 
     /**
@@ -60,9 +88,12 @@ class AlunoController extends Controller
     public function edit(string $id)
     {
         $dados = Aluno::findOrFail($id);
-        //dd($dado);
+        $categorias = CategoriaAluno::orderBy('nome')->get();
 
-        return view('aluno.form', ['dados' => $dados]);
+        return view('aluno.form', [
+            'dados' => $dados,
+            'categorias' => $categorias
+        ]);
     }
 
     /**
@@ -72,15 +103,23 @@ class AlunoController extends Controller
     {
         //dd($request->all(), $id);
 
-        $request->validate([
-            'nome' => 'required',
-            'cpf' => "required",
-        ],[
-            'nome.required' => 'O nome é obrigatório',
-            'cpf.required' => 'O CPF é obrigatório',
-        ]);
+        $this->validateRequest($request);
+        $data = $request->all();
+        $imagem = $request->file('imagem');
 
-        Aluno::updateOrCreate(['id' => $id], $request->all());
+        if ($imagem) {
+            $nome_imagem = date('YmdHis') . "." . $imagem->getClientOriginalExtension();
+            $diretorio = 'imagem/aluno/';
+
+            $imagem->storeAs(
+                $diretorio,
+                $nome_imagem,
+                'public'
+            );
+            $data['imagem'] = $diretorio . $nome_imagem;
+        }
+
+        Aluno::updateOrCreate(['id' => $id], $data);
 
         return redirect('aluno');
     }
@@ -91,7 +130,7 @@ class AlunoController extends Controller
     public function destroy(string $id)
     {
         $dados = Aluno::findOrFail($id);
-        
+
         $dados->delete();
 
         return redirect('aluno');
@@ -99,9 +138,11 @@ class AlunoController extends Controller
 
     public function search(Request $request)
     {
-        if(!empty($request->valor)){
+        if (!empty($request->valor)) {
             $dados = Aluno::where(
-                $request->tipo, 'like', "%$request->valor%"
+                $request->tipo,
+                'like',
+                "%$request->valor%"
             )->get();
         } else {
             $dados = Aluno::All();
